@@ -107,7 +107,7 @@ const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'nume
 const TY = parts[0], TM = parts[1]-1, TD = parts[2];
 
 let data = {rest:[], tian:[], zhang:[], li:[]};
-let cur = 'tian', viewOff = 0, selDay = null;
+let cur = 'any', viewOff = 0, selDay = null;
 
 function monthInfo(off){
   const d = new Date(Date.UTC(TY, TM+off, 1));
@@ -118,6 +118,19 @@ const overlap = (list,s,e) => list.some(([a,b]) => a < e && b > s);
 
 // 回傳某天的時段狀態 [{h, full}]
 function daySlots(key,y,m,d){
+  if(key==='any'){
+    const map = {};
+    for(const k of Object.keys(TEACHERS)){
+      for(const s of daySlotsOne(k,y,m,d)){
+        map[s.h] = (map[s.h]===undefined) ? s.full : (map[s.h] && s.full);
+      }
+    }
+    return Object.keys(map).map(Number).sort((a,b)=>a-b).map(h=>({h, full:map[h]}));
+  }
+  return daySlotsOne(key,y,m,d);
+}
+const nameOf = k => k==='any' ? '不指定' : TEACHERS[k].name;
+function daySlotsOne(key,y,m,d){
   const dow = new Date(Date.UTC(y,m,d)).getUTCDay();
   const hours = TEACHERS[key].days[dow] || [];
   const now = Date.now();
@@ -160,7 +173,7 @@ function render(){
   box.innerHTML = '';
   if(selDay && selDay<=days){
     const dow = new Date(Date.UTC(y,m,selDay)).getUTCDay();
-    ttl.textContent = `${TEACHERS[cur].name}｜${m+1}/${selDay}（${DOW[dow]}）`;
+    ttl.textContent = `${nameOf(cur)}｜${m+1}/${selDay}（${DOW[dow]}）`;
     const slots = daySlots(cur,y,m,selDay);
     if(!slots.length) box.innerHTML = '<span class="hint">當天無可預約時段</span>';
     else if(slots.every(s=>s.full)) box.innerHTML = '<span class="pill full">已滿</span>';
@@ -176,9 +189,9 @@ function render(){
 // 初始化介面
 document.getElementById('dows').innerHTML = DOW.map(d=>`<div class="dow">${d}</div>`).join('');
 const tabs = document.getElementById('tabs');
-Object.keys(TEACHERS).forEach(k=>{
+['any', ...Object.keys(TEACHERS)].forEach(k=>{
   const b = document.createElement('button');
-  b.className = 'tab' + (k===cur?' on':''); b.textContent = TEACHERS[k].name;
+  b.className = 'tab' + (k===cur?' on':''); b.textContent = nameOf(k);
   b.onclick = () => { cur = k; selDay = null;
     [...tabs.children].forEach(c=>c.classList.toggle('on', c===b)); render(); };
   tabs.appendChild(b);
