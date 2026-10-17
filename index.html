@@ -45,7 +45,7 @@ h1{margin:0;text-align:center;color:var(--crimson);font-size:22px;letter-spacing
 .dayttl{font-size:15px;color:var(--crimson);margin:0 0 10px;letter-spacing:1px}
 .slots{display:flex;flex-wrap:wrap;gap:8px}
 .pill{padding:8px 14px;border-radius:999px;border:1px solid var(--gold-light);background:#fff;font-size:15px}
-.pill.full{background:rgba(138,117,96,.12);border-color:transparent;color:var(--muted)
+.pill.full{background:rgba(138,117,96,.12);border-color:transparent;color:var(--muted)}
 .hint{color:var(--muted);font-size:14px}
 .btn{display:block;text-align:center;text-decoration:none;background:var(--crimson);color:#fff;
   padding:13px;border-radius:999px;font-size:16px;letter-spacing:3px;margin-top:4px}
@@ -86,8 +86,7 @@ h1{margin:0;text-align:center;color:var(--crimson);font-size:22px;letter-spacing
 <script>
 /* ===== 設定 ===== */
 // 貼上 Apps Script 部署後的網頁應用程式網址（結尾 /exec）；留空則顯示示範資料
-const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTEAR3LJuWMuF2RHlzBxa9SdKiG-dAsGNqgyDCFSfvtwu-Hn-tJXJ_L4ol4iGhChMDte-axwLihaJGq4aoctBLeQYYxR6I8XpFLtIodVn0a5Q0wfVyxYvJhF3J15ntzkzjapzQJ3PZ0jsoJCCWUcYP_k6z__Pj0znfYJ3FUE9_KzpoXQ3EdnALuYAIfispFh-ti8x6_9T3uEdzcTrewqlaOSPNRuakyNammWj9PkMmDhgsls3rnGUhmPHlhy06CLaVjiecRSR0w-5lJ0M47RbXsTdgrOg&lib=MxMlv-L2MQqJ0IPbxN3Ust0p1N-RQqVqO';
-
+const API_URL = 'https://script.google.com/macros/s/AKfycbwcbu2XKp9O6ipobiU-XWFF0zpOVOIRXLcPXUXwNKP-1Zpb7lJyGtaEHf_r9ffJH6foKg/exec';
 
 // 師父排班（0=週日 … 6=週六），已排除公休時段 12–14、17–18，最晚 20:00
 const A = [10,11,14,15,16,18,19,20];
@@ -163,7 +162,7 @@ function render(){
     let cls = 'cell', label = '';
     if(past) cls += ' past';
     else if(!slots.length) cls += ' off';
-    else if(open===0){ cls += ' full'; label = '已滿'; }
+    else if(open===0){ cls += ' full'; label = '預約已滿'; }
     else { cls += ' open'; }
     if(selDay===d) cls += ' sel';
     b.className = cls;
@@ -179,11 +178,11 @@ function render(){
     ttl.textContent = `${nameOf(cur)}｜${m+1}/${selDay}（${DOW[dow]}）`;
     const slots = daySlots(cur,y,m,selDay);
     if(!slots.length) box.innerHTML = '<span class="hint">當天無可預約時段</span>';
-    else if(slots.every(s=>s.full)) box.innerHTML = '<span class="pill full">已滿</span>';
+    else if(slots.every(s=>s.full)) box.innerHTML = '<span class="pill full">預約已滿</span>';
     else slots.forEach(s=>{
       const p = document.createElement('span');
       p.className = 'pill' + (s.full?' full':'');
-      p.textContent = `${pad(s.h)}:00` + (s.full?' 已滿':(s.who&&s.who.length>=2?'　'+s.who.join('、'):''));
+      p.textContent = `${pad(s.h)}:00` + (s.full?' 預約已滿':(s.who&&s.who.length>=2?'　'+s.who.join('、'):''));
       box.appendChild(p);
     });
   } else { ttl.textContent = '請點選日期查看時段'; }
