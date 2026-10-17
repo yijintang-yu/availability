@@ -162,7 +162,7 @@ function render(){
     let cls = 'cell', label = '';
     if(past) cls += ' past';
     else if(!slots.length) cls += ' off';
-    else if(open===0){ cls += ' full'; label = '預約已滿'; }
+    else if(open===0){ cls += ' full'; label = '已滿'; }
     else { cls += ' open'; }
     if(selDay===d) cls += ' sel';
     b.className = cls;
